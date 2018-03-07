@@ -4,15 +4,15 @@
   1)使用build.sh编译后打包;
   2)如果编译成功会在bin路径下生成可执行二进制文件"ecs.jar"；
   3)使用如下格式调用并调试程序，例如：
-	Linux环境：	root> sh startup.sh /xxx/data.txt /xxx/input.txt /xxx/output.txt
-	(说明：data.txt是历史数据文件，input.txt是其他参数输入文件，output.txt是输出文件)
+	Linux环境：	root> sh startup.sh /xxx/TrainData.txt /xxx/input.txt /xxx/output.txt
+	(说明：TrainData.txt是历史数据文件，input.txt是其他参数输入文件，output.txt是输出文件)
 	ps 以上步骤用于本地调试代码
   4)将源代码与makelist.txt更新后打包压缩到同一个压缩包下，压缩包格式为tar.gz或zip，即可上传答案。
   上传答案的目录格式为：
   ecs.tar.gz(文件格式可以为tar.gz或者zip格式，文件名称可以自定义，但不要包含中文或空格)
-	├─-bin/	
-    └── code/
-    └── makelist.txt
+	├─-- bin/	
+        └── code/
+        └── makelist.txt
 	├── build.sh		不可修改，否则会影响服务器打包编译
 	├── ecs_tar.sh
 	└── readme.txt	
