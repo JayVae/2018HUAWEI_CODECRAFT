@@ -15,19 +15,19 @@ import com.filetool.util.LogUtil;
 public class Main {
 	public static void main(String[] args) {
 
-//		if (args.length != 3) {
-//			System.err
-//					.println("please input args: ecsDataPath, inputFilePath, resultFilePath");
-//			return;?
-//		}
+		if (args.length != 3) {
+			System.err
+					.println("please input args: ecsDataPath, inputFilePath, resultFilePath");
+			return;
+		}
 
-//		String ecsDataPath = args[0];
-//		String inputFilePath = args[1];
-//		String resultFilePath = args[2];
+		String ecsDataPath = args[0];
+		String inputFilePath = args[1];
+		String resultFilePath = args[2];
 
-		String ecsDataPath = "E:\\HW\\练习数据\\初赛文档\\用例示例\\TestData_2015.2.20_2015.2.27.txt";
-		String inputFilePath = "E:\\HW\\练习数据\\初赛文档\\用例示例\\input_5flavors_cpu_7days.txt";
-		String resultFilePath = "E:\\HW\\练习数据\\初赛文档\\用例示例\\ans.txt";
+//		String ecsDataPath = "E:\\HW\\练习数据\\初赛文档\\用例示例\\TrainData_2015.1.1_2015.2.19.txt";
+//		String inputFilePath = "E:\\HW\\练习数据\\初赛文档\\用例示例\\input_5flavors_cpu_7days.txt";
+//		String resultFilePath = "E:\\HW\\练习数据\\初赛文档\\用例示例\\ans.txt";
 
 		LogUtil.printLog("Begin");
 
