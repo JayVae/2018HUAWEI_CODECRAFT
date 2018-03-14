@@ -2,7 +2,7 @@ com/filetool/main/Main.java
 com/filetool/util/FileUtil.java
 com/filetool/util/LogUtil.java
 com/elasticcloudservice/predict/Predict.java
-com.filetool.pojo.Ecs
-com.filetool.pojo.EcsCpuComparator
-com.filetool.pojo.EcsMemComparator
-com.filetool.pojo.Vm
+com/filetool/pojo/Ecs.java
+com/filetool/pojo/EcsCpuComparator.java
+com/filetool/pojo/EcsMemComparator.java
+com/filetool/pojo/Vm.java

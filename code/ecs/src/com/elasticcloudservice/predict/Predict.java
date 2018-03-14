@@ -136,7 +136,7 @@ public class Predict {
                     if(vmNext<tmp1 && vmCons<tmp2){
                         System.out.println(ecs.getCpuNum());
                         ecs.setCpuNum(tmp1-vmNext);
-                        ecs.setMemNum(tmp1-vmCons);
+                        ecs.setMemNum(tmp2-vmCons);
                         ecs.setNameList(flavorName);
                         needNew = false;
                         break;
@@ -174,12 +174,12 @@ public class Predict {
                 boolean needNew = true;
 
                 for (Ecs ecs : ecsList){
-                    int tmp1 = ecs.getCpuNum();
-                    int tmp2 = ecs.getMemNum();
+                    int tmp1 = ecs.getMemNum();
+                    int tmp2 = ecs.getCpuNum();
                     if(vmNext<tmp1 && vmCons<tmp2){
                         System.out.println(ecs.getCpuNum());
-                        ecs.setCpuNum(tmp1-vmNext);
-                        ecs.setMemNum(tmp1-vmCons);
+                        ecs.setMemNum(tmp1-vmNext);
+                        ecs.setCpuNum(tmp2-vmCons);
                         ecs.setNameList(flavorName);
                         needNew = false;
                         break;
@@ -188,8 +188,8 @@ public class Predict {
                 if(needNew){
                     //            下面这个是跟for是else的关系
                     ecsList.add(new Ecs(CPUNum,MEMNum));
-                    ecsList.get(ecsList.size()-1).setCpuNum(CPUNum-vmNext);
-                    ecsList.get(ecsList.size()-1).setMemNum(MEMNum-vmCons);
+                    ecsList.get(ecsList.size()-1).setCpuNum(CPUNum-vmCons);
+                    ecsList.get(ecsList.size()-1).setMemNum(MEMNum-vmNext);
                     ecsList.get(ecsList.size()-1).setNameList(flavorName);
                 }
 
@@ -209,10 +209,13 @@ public class Predict {
 
         results[vmNum.size()+1]= "";
 
-        for (int i = vmNum.size()+2;i<ecsList.size()+vmNum.size()+2;i++ ){
-            j=1;
-            results[i]=j+" "+ ecsList.get(j-1).Path();
-            j++;
+        results[vmNum.size()+2]=String.valueOf(ecsList.size());
+
+        int k=1;
+        for (int i = vmNum.size()+3;i<ecsList.size()+vmNum.size()+3;i++ ){
+
+            results[i]=k+ ecsList.get(k-1).Path();
+            k++;
         }
 		return results;
 	}
