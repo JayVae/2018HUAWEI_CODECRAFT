@@ -2,6 +2,7 @@ package com.elasticcloudservice.predict;
 
 import com.filetool.pojo.Ecs;
 import com.filetool.pojo.EcsCpuComparator;
+import com.filetool.pojo.EcsMemComparator;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -81,6 +82,9 @@ public class Predict {
         for (String str : keySet) {
             Double db = Double.valueOf(vmNum.get(str));
             vmNum.put(str, (int) (db/trainTime*preTime)+1);
+
+//            BigDecimal dbb = new BigDecimal(db/trainTime*preTime).setScale(0, BigDecimal.ROUND_HALF_UP);
+//            vmNum.put(str,dbb.intValue() );
         }
 /*        先用贪心算法进行分配：
         1.先计算非预测资源约束（先不考虑）；
@@ -96,6 +100,10 @@ public class Predict {
 
         int vmPreNum = 0;
         int j= 1;
+
+        int cpuPredAll = 0;
+        int memPredAll = 0;
+
         for (String str : keySet) {
             int vmKey = vmNum.get(str);
             vmPreNum = vmPreNum + vmKey;
@@ -107,15 +115,24 @@ public class Predict {
                 cpuList.add(cpuCost);
                 memList.add(memCost);
                 nameList.add(str);
+                cpuPredAll = cpuPredAll + cpuCost;
+                memPredAll = memPredAll + memCost;
             }
         }
+
+//        理论最小服务器数
+        int minEcsNum = max(cpuPredAll/CPUNum+1,memPredAll/MEMNum+1);
+        double percent = cpuPredAll/(minEcsNum*CPUNum);
+
+
 
 
         List<Ecs> ecsList = new ArrayList<>();
         ecsList.add(new Ecs(CPUNum,MEMNum));
 
         int cpuListLength = cpuList.size();
-
+        double predAll = 0;
+//        double consAll =0;
         if(preType.equals("CPU")){
 
 //从大到小排序
@@ -133,7 +150,7 @@ public class Predict {
                 for (Ecs ecs : ecsList){
                     int tmp1 = ecs.getCpuNum();
                     int tmp2 = ecs.getMemNum();
-                    if(vmNext<tmp1 && vmCons<tmp2){
+                    if(vmNext<=tmp1 && vmCons<=tmp2){
                         System.out.println(ecs.getCpuNum());
                         ecs.setCpuNum(tmp1-vmNext);
                         ecs.setMemNum(tmp2-vmCons);
@@ -153,6 +170,7 @@ public class Predict {
 //                int index =  cpuList.indexOf(vmNext);
 //                int vmCons = memList.get(index);
 //                String flavorName = nameList.get(index);
+                predAll = predAll + vmNext;
                 cpuList.remove(index);
                 memList.remove(index);
                 nameList.remove(index);
@@ -165,18 +183,16 @@ public class Predict {
                 int index =  memList.indexOf(vmNext);
                 int vmCons = cpuList.get(index);
                 String flavorName = nameList.get(index);
-//                int vmNext =  memList.get(i);
-//                int vmCons = cpuList.get(i);
-//                String flavorName = nameList.get(i);
 
-                Collections.sort(ecsList,new EcsCpuComparator());
+//                Collections.sort(ecsList,new EcsMemComparator());
+                Collections.sort(ecsList,new EcsMemComparator());
 
                 boolean needNew = true;
 
                 for (Ecs ecs : ecsList){
                     int tmp1 = ecs.getMemNum();
                     int tmp2 = ecs.getCpuNum();
-                    if(vmNext<tmp1 && vmCons<tmp2){
+                    if(vmNext<=tmp1 && vmCons<=tmp2){
                         System.out.println(ecs.getCpuNum());
                         ecs.setMemNum(tmp1-vmNext);
                         ecs.setCpuNum(tmp2-vmCons);
@@ -196,12 +212,14 @@ public class Predict {
 //                int index =  cpuList.indexOf(vmNext);
 //                int vmCons = memList.get(index);
 //                String flavorName = nameList.get(index);
+                predAll = predAll + vmNext;
                 cpuList.remove(index);
                 memList.remove(index);
                 nameList.remove(index);
             }
 
         }
+
 
 
 //将结果输出，结果包括两部分，预测部分在vmNum，分配结果在ecsList中
@@ -217,8 +235,24 @@ public class Predict {
             results[i]=k+ ecsList.get(k-1).Path();
             k++;
         }
-		return results;
+
+        //        评测分配阶段的利用率：
+        if (preType .equals("CPU")){
+            System.out.println(predAll/(ecsList.size()*CPUNum));
+        }else {
+            System.out.println(predAll/(ecsList.size()*MEMNum));
+        }
+
+
+
+
+
+        return results;
 	}
+
+    private static int max(int num1, int num2) {
+	    return (num1 > num2 ? num1 : num2);
+    }
 
 
 }
