@@ -136,10 +136,15 @@ public class Predict {
                 int cpuAdp = ecsList.get(ecsList.size()-1).getCpuNum();
                 int memAdp = ecsList.get(ecsList.size()-1).getMemNum();
 //                改一个完全背包就行了,备选物品是1:1的那几个
-                int numAdp = Math.min(cpuAdp,memAdp);
+
                 String str = Collections.min(keySet);
-
-
+                int cpuCost = vmMap.get(str)[0];
+                int memCost = vmMap.get(str)[1]>>10;
+                int numAdp = Math.min(cpuAdp/cpuCost,memAdp/memCost);
+                vmPreNum = vmPreNum + numAdp;
+                int oriNum = vmNum.get(str);
+                vmNum.put(str,oriNum+numAdp);
+                // TODO: 2018/3/16  
 
             }
         }else{
