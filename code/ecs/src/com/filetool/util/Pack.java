@@ -61,13 +61,19 @@ public class Pack {
 //                System.out.println("选择了第"+i+"个vm");
                 cpuAllCost = cpuAllCost - cpuList.get(i);
                 memAllCost = memAllCost - memList.get(i);
-                ecsList.get(kkk).setNameList(nameList.get(i));
+                Ecs ecs = ecsList.get(kkk);
+                ecs.setNameList(nameList.get(i));
                 cpuListCopy.remove(i);
                 memListCopy.remove(i);
                 nameListCopy.remove(i);
             }
             i--;
         }
+
+        ecsList.get(kkk).setMemNum(memAllCost);
+        ecsList.get(kkk).setCpuNum(cpuAllCost);
+        ecsList.get(kkk).setCpuPercent((double) (CPUNum-cpuAllCost)/CPUNum);
+        ecsList.get(kkk).setMemPercent((double) (MEMNum-memAllCost)/MEMNum);
 
 
         if (cpuListCopy.size()!=0){

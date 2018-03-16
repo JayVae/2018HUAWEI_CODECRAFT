@@ -15,6 +15,18 @@ public class Ecs {
 
     private List<String> nameList = new ArrayList<>();
 
+    private double cpuPercent;
+
+    private double memPercent;
+
+    public double getMemPercent() {
+        return memPercent;
+    }
+
+    public void setMemPercent(double memPercent) {
+        this.memPercent = memPercent;
+    }
+
     public String Path() {
         StringBuffer sb = new StringBuffer();
         List<String> list = this.nameList;
@@ -39,6 +51,14 @@ public class Ecs {
 
     public List<String> getNameList() {
         return nameList;
+    }
+
+    public double getCpuPercent() {
+        return cpuPercent;
+    }
+
+    public void setCpuPercent(double cpuPercent) {
+        this.cpuPercent = cpuPercent;
     }
 
     public Ecs(int cpuNum, int memNum) {

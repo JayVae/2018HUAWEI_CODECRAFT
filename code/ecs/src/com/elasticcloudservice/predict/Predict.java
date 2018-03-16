@@ -83,7 +83,7 @@ public class Predict {
         List<String> nameList = new ArrayList<>();
 
         int vmPreNum = 0;
-        int j= 1;
+
 
         int cpuPredAll = 0;
         int memPredAll = 0;
@@ -91,8 +91,6 @@ public class Predict {
         for (String str : keySet) {
             int vmKey = vmNum.get(str);
             vmPreNum = vmPreNum + vmKey;
-            results[j]=str+" "+String.valueOf(vmKey);
-            j++;
             int cpuCost = vmMap.get(str)[0];
             int memCost = vmMap.get(str)[1]>>10;
             for (int i = 0; i < vmKey; i++) {
@@ -108,6 +106,7 @@ public class Predict {
 //         理论理论最小服务器数
         int minEcsNum = Math.max(cpuPredAll/CPUNum+1,memPredAll/MEMNum+1);
         double percent = (double) cpuPredAll/(minEcsNum*CPUNum);
+        System.out.println(percent);
 
         List<Ecs> ecsList = new ArrayList<>();
         ecsList.add(new Ecs(CPUNum,MEMNum));
@@ -121,8 +120,52 @@ public class Predict {
 
 //        GreedMethod.greed1(CPUNum,MEMNum,cpuList,memList,nameList,ecsList,preType);
 
+//      判断最后一个的利用率
+        if (preType.equals("CPU")){
+            if(ecsList.get(ecsList.size()-1).getCpuPercent()< 0.3 ){
+                List<String> delList = ecsList.get(ecsList.size()-1).getNameList();
+                for (String str: delList){
+                    if(keySet.contains(str)){
+                        int oriNum = vmNum.get(str);
+                        vmNum.put(str,oriNum-1);
+                        vmPreNum=vmPreNum-1;
+                    }
+                }
+                ecsList.remove(ecsList.size()-1);
+            }else if (ecsList.get(ecsList.size()-1).getCpuPercent() >0.6 && ecsList.get(ecsList.size()-1).getCpuPercent()<0.9){
+                int cpuAdp = ecsList.get(ecsList.size()-1).getCpuNum();
+                int memAdp = ecsList.get(ecsList.size()-1).getMemNum();
+//                改一个完全背包就行了,备选物品是1:1的那几个
+                int numAdp = Math.min(cpuAdp,memAdp);
+                String str = Collections.min(keySet);
+
+
+
+            }
+        }else{
+            if(ecsList.get(ecsList.size()-1).getMemPercent()< 0.3 ){
+                List<String> delList = ecsList.get(ecsList.size()-1).getNameList();
+                for (String str: delList){
+                    if(keySet.contains(str)){
+                        int oriNum = vmNum.get(str);
+                        vmNum.put(str,oriNum-1);
+                        vmPreNum=vmPreNum-1;
+                    }
+                }
+                ecsList.remove(ecsList.size()-1);
+            }
+        }
+
+
 
 //将结果输出，结果包括两部分，预测部分在vmNum，分配结果在ecsList中
+        int j= 1;
+        for (String str:keySet){
+            int vmKey = vmNum.get(str);
+            results[j]=str+" "+String.valueOf(vmKey);
+            j++;
+        }
+
         results[0] = String.valueOf(vmPreNum);
 
         results[vmNum.size()+1]= "";
@@ -136,12 +179,22 @@ public class Predict {
             k++;
         }
 
-        //        评测分配阶段的利用率：
-        if (preType .equals("CPU")){
-            System.out.println((double)cpuPredAll/(ecsList.size()*CPUNum));
-        }else {
-            System.out.println((double)memPredAll/(ecsList.size()*MEMNum));
+        double percentAdp =0;
+        System.out.println("每个ecs的利用率如下：");
+        for (Ecs ecs : ecsList) {
+            System.out.println(ecs.getCpuPercent());
+            percentAdp=percentAdp+ecs.getCpuPercent();
         }
+        //        评测分配阶段的利用率：
+        System.out.println("原来所有ecs的利用率如下：");
+        if (preType .equals("CPU")){
+            System.out.println((double)cpuPredAll/((ecsList.size()+1)*CPUNum));
+        }else {
+            System.out.println((double)memPredAll/((ecsList.size()+1)*MEMNum));
+        }
+
+        System.out.println("现在所有ecs的利用率如下：");
+        System.out.println(percentAdp/ecsList.size());
 
         return results;
 	}

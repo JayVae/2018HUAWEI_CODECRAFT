@@ -47,15 +47,18 @@ public class GreedMethod {
                         ecs.setCpuNum(tmp1 - vmNext);
                         ecs.setMemNum(tmp2 - vmCons);
                         ecs.setNameList(flavorName);
+                        ecs.setCpuPercent((double) (CPUNum-ecs.getCpuNum())/CPUNum);
                         needNew = false;
                         break;
                     }
                 }
                 if (needNew) {
+
                     ecsList.add(new Ecs(CPUNum, MEMNum));
                     ecsList.get(ecsList.size() - 1).setCpuNum(CPUNum - vmNext);
                     ecsList.get(ecsList.size() - 1).setMemNum(MEMNum - vmCons);
                     ecsList.get(ecsList.size() - 1).setNameList(flavorName);
+                    ecsList.get(ecsList.size() - 1).setCpuPercent((double) (CPUNum-ecsList.get(ecsList.size() - 1).getCpuNum())/CPUNum);
                 }
             }else{
                     for (Ecs ecs : ecsList){
