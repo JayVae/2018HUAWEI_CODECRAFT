@@ -1,10 +1,9 @@
 package com.elasticcloudservice.predict;
 
 import com.filetool.pojo.Ecs;
+import com.filetool.util.DateUtil;
 import com.filetool.util.Pack;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Predict {
@@ -34,9 +33,12 @@ public class Predict {
 		}
 
 //		训练数据集的处理,vmNum中存训练集中的请求数据
+//        vmSeries存取各个类别的时间序列
+        Map<String,int[]> vmSeries = new HashMap<>();
         Set<String> keySet = vmMap.keySet();
         Map<String,Integer> vmNum = new HashMap<>();
         String startTrainTime = ecsContent[0].split("\t")[2].split(" ")[0];
+        String endTrainTime = ecsContent[ecsContent.length-1].split("\t")[2].split(" ")[0];
 
         for (String str : keySet) {
             vmNum.put(str,0);
@@ -51,39 +53,29 @@ public class Predict {
 				if(keySet.contains(flavorName)){
 				    vmNum.put(flavorName,vmNum.get(flavorName)+1);
 				}
-
 			}
 		}
 
 //		计算时间间隔，取平均取整（进一法），并将flavor的预测次数存到vmNum中。
-        //算两个日期间隔多少天
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        Date date1 = null;
-        Date date2 = null;
-        Date date3 = null;
-        try {
-            date1 = format.parse(startTrainTime);
-            date2 = format.parse(startDate);
-            date3 = format.parse(endDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        int trainTime = (int) ((date2.getTime() - date1.getTime()) / (1000*3600*24));
-        int  preTime = (int) ((date3.getTime() - date2.getTime()+1) / (1000*3600*24));
+        //算两个日期间隔多少天,先考虑时间训练数据集的最后一天与预测的起始日期是连续的
+        int trainTime=DateUtil.getDayLength(startTrainTime,startDate)-1;
+        int preTime=DateUtil.getDayLength(startDate,endDate);
+
+//      下述是按平均值进行预测的：
         for (String str : keySet) {
             Double db = Double.valueOf(vmNum.get(str));
             vmNum.put(str, (int) (db/trainTime*preTime)+1);
-
-//            BigDecimal dbb = new BigDecimal(db/trainTime*preTime).setScale(0, BigDecimal.ROUND_HALF_UP);
-//            vmNum.put(str,dbb.intValue() );
+//            注释掉的是按照四舍五入来做的
+/*            BigDecimal dbb = new BigDecimal(db/trainTime*preTime).setScale(0, BigDecimal.ROUND_HALF_UP);
+            vmNum.put(str,dbb.intValue() );*/
         }
+//        预测方法二：ARIMA
 
         List<Integer> cpuList = new ArrayList();
         List<Integer> memList = new ArrayList();
         List<String> nameList = new ArrayList<>();
 
         int vmPreNum = 0;
-
 
         int cpuPredAll = 0;
         int memPredAll = 0;
@@ -144,7 +136,14 @@ public class Predict {
                 vmPreNum = vmPreNum + numAdp;
                 int oriNum = vmNum.get(str);
                 vmNum.put(str,oriNum+numAdp);
-                // TODO: 2018/3/16  
+                ecsList.get(ecsList.size()-1).setCpuNum(cpuAdp-numAdp*cpuCost);
+                ecsList.get(ecsList.size()-1).setMemNum(memAdp-numAdp*memCost);
+                ecsList.get(ecsList.size()-1).setCpuPercent(ecsList.get(ecsList.size()-1).getCpuNum()/CPUNum);
+                ecsList.get(ecsList.size()-1).setMemPercent(ecsList.get(ecsList.size()-1).getMemNum()/MEMNum);
+                for (int ttt=0;ttt<numAdp;ttt++) {
+                    ecsList.get(ecsList.size() - 1).setNameList(str);
+                }
+
 
             }
         }else{
@@ -158,6 +157,25 @@ public class Predict {
                     }
                 }
                 ecsList.remove(ecsList.size()-1);
+            }else if (ecsList.get(ecsList.size()-1).getMemPercent() >0.6 && ecsList.get(ecsList.size()-1).getMemPercent()<0.9){
+                int cpuAdp = ecsList.get(ecsList.size()-1).getCpuNum();
+                int memAdp = ecsList.get(ecsList.size()-1).getMemNum();
+//                改一个完全背包就行了,备选物品是1:1的那几个
+
+                String str = Collections.min(keySet);
+                int cpuCost = vmMap.get(str)[0];
+                int memCost = vmMap.get(str)[1]>>10;
+                int numAdp = Math.min(cpuAdp/cpuCost,memAdp/memCost);
+                vmPreNum = vmPreNum + numAdp;
+                int oriNum = vmNum.get(str);
+                vmNum.put(str,oriNum+numAdp);
+                ecsList.get(ecsList.size()-1).setCpuNum(cpuAdp-numAdp*cpuCost);
+                ecsList.get(ecsList.size()-1).setMemNum(memAdp-numAdp*memCost);
+                ecsList.get(ecsList.size()-1).setCpuPercent(ecsList.get(ecsList.size()-1).getCpuNum()/CPUNum);
+                ecsList.get(ecsList.size()-1).setMemPercent(ecsList.get(ecsList.size()-1).getMemNum()/MEMNum);
+                for (int ttt=0;ttt<numAdp;ttt++){
+                    ecsList.get(ecsList.size()-1).setNameList(str);
+                }
             }
         }
 
