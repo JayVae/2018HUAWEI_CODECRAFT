@@ -40,7 +40,7 @@ public class Ecs {
         while (it.hasNext()) {
             Map.Entry<String, Integer> entry = (Map.Entry<String, Integer>) it.next();
             sb.append( " "+entry.getKey()+" "+entry.getValue());
-            System.out.println("key " + entry.getKey() + " value : " + entry.getValue());
+//            System.out.println("key " + entry.getKey() + " value : " + entry.getValue());
         }
         return sb.toString();
     }
