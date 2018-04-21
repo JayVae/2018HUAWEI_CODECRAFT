@@ -25,6 +25,7 @@ public class Main {
 //		String inputFilePath = args[1];
 //		String resultFilePath = args[2];
 
+//		本地的文件
 		String ecsDataPath = "E:\\HW\\练习数据\\初赛文档\\练习数据\\data_2015_4.txt";
 		String inputFilePath = "E:\\HW\\练习数据\\初赛文档\\用例示例\\input_5flavors_cpu_7days.txt";
 		String resultFilePath = "E:\\HW\\练习数据\\初赛文档\\用例示例\\ans.txt";
