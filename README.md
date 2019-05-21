@@ -8,7 +8,8 @@
 考虑为背包问题
 
 ## 比赛过程名次记录
-其实初赛的成绩还不错，在前三名好久，但是最后没时间弄了，最后连32强都没进，各种原因放后面总结吧
+其实初赛的成绩还不错，在前三名好久，但是最后没时间弄了，最后连32强都没进，各种原因放后面总结吧。
+P.S. 我们的队名叫“响亮的队名”O(∩_∩)O
 
 ![2018年03月14日](https://raw.githubusercontent.com/JayVae/pictures/master/res/20180314.jpg)
 ![20180317](https://raw.githubusercontent.com/JayVae/pictures/master/res/20180317.png)
